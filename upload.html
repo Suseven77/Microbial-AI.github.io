@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上传菌种数据</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: #f8fdf9;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: linear-gradient(135deg, #66bb6a 0%, #4caf50 100%);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            height: 80px;
+            width: auto;
+            margin-right: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .back-btn {
+            background-color: #f5f5f5;
+            color: #4caf50;
+            border: 1px solid #4caf50;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background-color: #e8f5e9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .page-title {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* 上传表单 */
+        .upload-form {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin-bottom: 30px;
+            border-top: 3px solid #81c784;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            border-color: #81c784;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(129, 199, 132, 0.2);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-hint {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #81c784 0%, #66bb6a 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .submit-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 预测按钮样式 */
+        .predict-btn {
+            background: linear-gradient(135deg, #81c784 0%, #66bb6a 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .predict-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 图片上传区域 */
+        .image-upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+            cursor: pointer;
+        }
+
+        .image-upload-area:hover {
+            border-color: #81c784;
+        }
+
+        .image-upload-area.dragover {
+            border-color: #81c784;
+            background-color: #f8f9fa;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            margin: 15px auto;
+            display: none;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 4px;
+        }
+
+        .filename-input {
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* 预测结果样式 */
+        .prediction-results {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #4caf50;
+        }
+
+        .prediction-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 15px;
+        }
+
+        .prediction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 8px;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .prediction-rank {
+            background-color: #4caf50;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .prediction-strain {
+            flex: 1;
+            margin-left: 12px;
+            font-weight: 500;
+        }
+
+        .prediction-probability {
+            font-weight: bold;
+            color: #2e7d32;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        /* 成功弹窗 */
+        .success-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .success-content {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .success-icon {
+            font-size: 48px;
+            color: #66bb6a;
+            margin-bottom: 20px;
+        }
+
+        .success-title {
+            font-size: 24px;
+            color: #66bb6a;
+            margin-bottom: 15px;
+        }
+
+        .success-message {
+            margin-bottom: 25px;
+            color: #666;
+        }
+
+        .success-btn {
+            background: linear-gradient(135deg, #81c784 0%, #66bb6a 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .success-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        /* 加载状态 */
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 16px;
+            color: #666;
+            display: none;
+        }
+
+        .predict-loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 响应式布局 */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .page-title {
+                position: static;
+                transform: none;
+                order: 1;
+            }
+
+            .back-btn {
+                align-self: flex-start;
+                order: 2;
+            }
+
+            .logo-container {
+                order: 3;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="header-container">
+                <!-- Logo区域 -->
+                <div class="logo-container">
+                    <img src="/static/1.jpg" alt="菌种数据平台Logo" class="logo">
+                </div>
+
+                <!-- 标题居中 -->
+                <h1 class="page-title">上传菌种数据</h1>
+
+                <!-- 返回按钮在右侧 -->
+                <button class="back-btn" id="backBtn">返回主页</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- 单个菌种上传表单 -->
+        <div class="upload-form">
+            <h2 style="color: #4caf50; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #eee;">上传菌种数据</h2>
+            <form id="singleUploadForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label class="form-label" for="strainId">菌种ID *</label>
+                    <input type="text" class="form-input" id="strainId" name="id" required>
+                    <div class="form-hint">请输入唯一的菌种标识符</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="sequence">基因序列 *</label>
+                    <textarea class="form-textarea" id="sequence" name="sequence" required placeholder="请输入完整的基因序列，然后点击下方的预测按钮自动获取概率"></textarea>
+                    <button type="button" class="predict-btn" id="predictBtn">
+                        <span id="predictBtnText">自动预测概率</span>
+                    </button>
+                    <div class="form-hint">请输入完整的基因序列，然后点击预测按钮自动获取43种菌株的概率预测</div>
+                </div>
+
+                <!-- 预测结果显示区域 -->
+                <div class="prediction-results" id="predictionResults" style="display: none;">
+                    <div class="prediction-title">预测结果 (43种菌株)</div>
+                    <div id="predictionList">
+                        <!-- 预测结果将通过JavaScript动态填充 -->
+                    </div>
+                    <div class="form-hint" style="margin-top: 10px;">系统将自动选择概率最高的菌种作为主要分类</div>
+                </div>
+
+                <!-- 隐藏的乳酸菌和芽孢杆菌概率字段，用于向后端兼容 -->
+                <input type="hidden" id="lactobacillusProb" name="lactobacillusProb" value="0.5">
+                <input type="hidden" id="bacillusProb" name="bacillusProb" value="0.5">
+
+                <div class="form-group">
+                    <label class="form-label" for="basicInfo">基本信息</label>
+                    <textarea class="form-textarea" id="basicInfo" name="basicInfo"></textarea>
+                    <div class="form-hint">请输入菌种的基本描述信息</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="price">价格 *</label>
+                    <input type="text" class="form-input" id="price" name="price" required>
+                    <div class="form-hint">例如: 100元/株</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="supplier">供应商 *</label>
+                    <input type="text" class="form-input" id="supplier" name="supplier" required>
+                </div>
+
+                <!-- 图片上传区域 -->
+                <div class="form-group">
+                    <label class="form-label">菌种图片</label>
+                    <div class="image-upload-area" id="imageUploadArea">
+                        <div class="upload-icon">📁</div>
+                        <div class="upload-text">
+                            <p>拖拽图片到这里，或点击选择图片</p>
+                            <p style="font-size: 14px; color: #999;">支持 PNG, JPG, JPEG, GIF, BMP, WEBP 格式</p>
+                        </div>
+                        <input type="file" id="imageFile" accept="image/*" style="display: none;">
+                        <div class="image-preview" id="imagePreview">
+                            <img src="" alt="图片预览">
+                        </div>
+                        <div class="filename-input" id="filenameInput">
+                            <input type="text" class="form-input" id="customFilename" placeholder="输入图片文件名（可选）">
+                            <div class="form-hint">留空将使用原始文件名</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">上传菌种数据</button>
+            </form>
+        </div>
+
+        <!-- 加载状态 -->
+        <div class="loading" id="loadingMessage">正在上传数据...</div>
+    </div>
+
+    <!-- 成功弹窗 -->
+    <div class="success-modal" id="successModal">
+        <div class="success-content">
+            <div class="success-icon">✓</div>
+            <h2 class="success-title">上传成功！</h2>
+            <p class="success-message" id="successMessage">菌种数据已成功上传到系统</p>
+            <button class="success-btn" id="successOkBtn">确定</button>
+        </div>
+    </div>
+
+    <script>
+        // API基础URL - 使用相对路径
+        const API_BASE_URL = '';
+
+        // 返回主页
+        document.getElementById('backBtn').addEventListener('click', () => {
+            window.location.href = '/theshow';
+        });
+
+        // 显示成功弹窗
+        function showSuccessModal(message) {
+            const successModal = document.getElementById('successModal');
+            const successMessage = document.getElementById('successMessage');
+            successMessage.textContent = message;
+            successModal.style.display = 'flex';
+        }
+
+        // 隐藏成功弹窗
+        document.getElementById('successOkBtn').addEventListener('click', () => {
+            document.getElementById('successModal').style.display = 'none';
+        });
+
+        // 显示/隐藏加载状态
+        function setLoading(loading) {
+            const loadingMessage = document.getElementById('loadingMessage');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (loading) {
+                loadingMessage.style.display = 'block';
+                submitBtn.disabled = true;
+            } else {
+                loadingMessage.style.display = 'none';
+                submitBtn.disabled = false;
+            }
+        }
+
+        // 设置预测按钮加载状态
+        function setPredictLoading(loading) {
+            const predictBtn = document.getElementById('predictBtn');
+            const predictBtnText = document.getElementById('predictBtnText');
+
+            if (loading) {
+                predictBtn.disabled = true;
+                predictBtnText.innerHTML = '<span class="predict-loading"></span>预测中...';
+            } else {
+                predictBtn.disabled = false;
+                predictBtnText.textContent = '自动预测概率';
+            }
+        }
+
+        // 自动预测概率功能 - 修改为43种菌株预测
+        document.getElementById('predictBtn').addEventListener('click', async () => {
+            const sequence = document.getElementById('sequence').value.trim();
+
+            if (!sequence) {
+                alert('请输入基因序列');
+                return;
+            }
+
+            if (sequence.length < 50) {
+                alert('基因序列长度至少需要50个字符');
+                return;
+            }
+
+            try {
+                setPredictLoading(true);
+
+                // 使用 /analyze 接口进行43种菌株预测
+                const response = await fetch(`${API_BASE_URL}/analyze`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ sequence: sequence })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || '预测失败');
+                }
+
+                const result = await response.json();
+
+                // 显示预测结果
+                displayPredictionResults(result);
+
+                // 显示成功消息
+                showSuccessModal('概率预测成功！已分析43种菌株的概率分布');
+
+            } catch (error) {
+                console.error('预测失败:', error);
+                alert(`预测失败: ${error.message}`);
+            } finally {
+                setPredictLoading(false);
+            }
+        });
+
+        // 显示预测结果 - 处理中英文格式
+        function displayPredictionResults(result) {
+            const predictionResults = document.getElementById('predictionResults');
+            const predictionList = document.getElementById('predictionList');
+
+            // 清空之前的预测结果
+            predictionList.innerHTML = '';
+
+            // 获取概率数据
+            const probabilities = result.probabilities || result.class_probabilities || {};
+            const topPredictions = result.top_predictions || [];
+
+            if (Object.keys(probabilities).length === 0) {
+                predictionList.innerHTML = '<div style="text-align: center; color: #666;">未获得预测结果</div>';
+                predictionResults.style.display = 'block';
+                return;
+            }
+
+            // 使用排序后的预测结果或自己排序
+            const sortedProbabilities = topPredictions.length > 0 ?
+                topPredictions :
+                Object.entries(probabilities)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 5); // 只显示前5个最高概率
+
+            // 显示预测结果
+            sortedProbabilities.forEach(([strain, probability], index) => {
+                const probabilityPercent = (probability * 100).toFixed(2);
+                const predictionItem = document.createElement('div');
+                predictionItem.className = 'prediction-item';
+
+                predictionItem.innerHTML = `
+                    <div class="prediction-rank">${index + 1}</div>
+                    <div class="prediction-strain">${strain}</div>
+                    <div class="prediction-probability">${probabilityPercent}%</div>
+                `;
+
+                predictionList.appendChild(predictionItem);
+            });
+
+            // 保存前两个预测结果用于表单提交
+            if (sortedProbabilities.length > 0) {
+                // 使用显示名称（中英文格式）
+                createOrUpdateHiddenField('top1_species', sortedProbabilities[0][0]);
+                createOrUpdateHiddenField('top1_prob', sortedProbabilities[0][1]);
+
+                if (sortedProbabilities.length > 1) {
+                    createOrUpdateHiddenField('top2_species', sortedProbabilities[1][0]);
+                    createOrUpdateHiddenField('top2_prob', sortedProbabilities[1][1]);
+                } else {
+                    createOrUpdateHiddenField('top2_species', '');
+                    createOrUpdateHiddenField('top2_prob', '0');
+                }
+
+                // 自动填充基本信息字段
+                autoFillBasicInfo(result);
+            }
+
+            // 显示预测结果区域
+            predictionResults.style.display = 'block';
+        }
+
+        // 自动填充基本信息
+        function autoFillBasicInfo(result) {
+            const basicInfoField = document.getElementById('basicInfo');
+            if (basicInfoField && !basicInfoField.value.trim()) {
+                const sequenceLength = result.sequence_length || document.getElementById('sequence').value.length;
+                const gcContent = result.gc_content || 0;
+
+                const basicInfo = `序列长度: ${sequenceLength} bp GC含量: ${gcContent.toFixed(2)}% 序列复杂度: 0.365 香农熵: 1.950`;
+                basicInfoField.value = basicInfo;
+            }
+        }
+
+        // 创建或更新隐藏字段
+        function createOrUpdateHiddenField(name, value) {
+            let field = document.querySelector(`input[name="${name}"]`);
+            if (!field) {
+                field = document.createElement('input');
+                field.type = 'hidden';
+                field.name = name;
+                document.getElementById('singleUploadForm').appendChild(field);
+            }
+            field.value = value;
+        }
+
+        // 图片上传相关功能
+        const imageUploadArea = document.getElementById('imageUploadArea');
+        const imageFileInput = document.getElementById('imageFile');
+        const imagePreview = document.getElementById('imagePreview');
+        const filenameInput = document.getElementById('filenameInput');
+        const customFilename = document.getElementById('customFilename');
+
+        // 点击上传区域选择文件
+        imageUploadArea.addEventListener('click', () => {
+            imageFileInput.click();
+        });
+
+        // 拖拽功能
+        imageUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            imageUploadArea.classList.add('dragover');
+        });
+
+        imageUploadArea.addEventListener('dragleave', () => {
+            imageUploadArea.classList.remove('dragover');
+        });
+
+        imageUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            imageUploadArea.classList.remove('dragover');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleImageFile(files[0]);
+            }
+        });
+
+        // 文件选择变化
+        imageFileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleImageFile(e.target.files[0]);
+            }
+        });
+
+        // 处理图片文件
+        function handleImageFile(file) {
+            // 验证文件类型
+            const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/bmp', 'image/webp'];
+            if (!validTypes.includes(file.type)) {
+                alert('请选择有效的图片文件！');
+                return;
+            }
+
+            // 显示文件名输入
+            filenameInput.style.display = 'block';
+
+            // 设置默认文件名
+            const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+            customFilename.value = nameWithoutExt;
+
+            // 显示图片预览
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.querySelector('img').src = e.target.result;
+                imagePreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 单个菌种上传 - 43分类版本
+        document.getElementById('singleUploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+
+            // 验证必需字段
+            const requiredFields = ['id', 'sequence', 'price', 'supplier'];
+            for (let field of requiredFields) {
+                if (!formData.get(field)) {
+                    alert(`请填写${field === 'id' ? '菌种ID' : field}字段`);
+                    return;
+                }
+            }
+
+            // 验证概率值
+            const top1Prob = parseFloat(formData.get('top1_prob') || '0');
+            const top2Prob = parseFloat(formData.get('top2_prob') || '0');
+
+            if (isNaN(top1Prob) || isNaN(top2Prob) ||
+                top1Prob < 0 || top1Prob > 1 ||
+                top2Prob < 0 || top2Prob > 1) {
+                alert('概率值必须在0到1之间');
+                return;
+            }
+
+            try {
+                setLoading(true);
+
+                // 如果有图片文件，先上传图片
+                const imageFile = imageFileInput.files[0];
+                let imageFilename = '';
+                if (imageFile) {
+                    const imageFormData = new FormData();
+                    imageFormData.append('image', imageFile);
+                    if (customFilename.value.trim()) {
+                        imageFormData.append('filename', customFilename.value.trim());
+                    }
+
+                    const imageResponse = await fetch(`${API_BASE_URL}/api/upload/image`, {
+                        method: 'POST',
+                        body: imageFormData
+                    });
+
+                    if (!imageResponse.ok) {
+                        const error = await imageResponse.json();
+                        throw new Error(error.error || '图片上传失败');
+                    }
+
+                    const imageResult = await imageResponse.json();
+                    imageFilename = imageResult.filename;
+                    formData.set('image', imageFilename);
+                }
+
+                // 上传菌种数据 - 43分类版本
+                const response = await fetch(`${API_BASE_URL}/api/strains/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || '菌种数据上传失败');
+                }
+
+                const result = await response.json();
+
+                // 显示成功弹窗
+                let successMessage = `菌种 ${result.id} 数据上传成功！`;
+
+                // 显示具体的菌株名称和概率
+                const top1Species = formData.get('top1_species');
+                const top1Prob = (parseFloat(formData.get('top1_prob')) * 100).toFixed(2);
+                const top2Species = formData.get('top2_species');
+                const top2Prob = (parseFloat(formData.get('top2_prob')) * 100).toFixed(2);
+
+                if (top1Species) {
+                    successMessage += ` 最高概率菌株: ${top1Species} (${top1Prob}%)`;
+                    if (top2Species) {
+                        successMessage += `, 次高概率菌株: ${top2Species} (${top2Prob}%)`;
+                    }
+                }
+
+                if (imageFile) {
+                    successMessage += ` 图片已上传。`;
+                }
+                showSuccessModal(successMessage);
+
+                // 清空表单
+                e.target.reset();
+                imagePreview.style.display = 'none';
+                filenameInput.style.display = 'none';
+                imageFileInput.value = '';
+                document.getElementById('predictionResults').style.display = 'none';
+
+                // 清空隐藏字段
+                document.querySelectorAll('input[type="hidden"]').forEach(field => {
+                    if (['top1_species', 'top1_prob', 'top2_species', 'top2_prob'].includes(field.name)) {
+                        field.remove();
+                    }
+                });
+
+            } catch (error) {
+                console.error('上传失败:', error);
+                alert(`上传失败: ${error.message}`);
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        // 点击弹窗外部关闭
+        document.getElementById('successModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('successModal')) {
+                document.getElementById('successModal').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
